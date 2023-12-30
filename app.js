@@ -19,8 +19,14 @@ let myConnection = mysql.createConnection(
         database:'group3'
     }
 )
-
-//  step six: create table 
+myConnection.connect((err)=>{
+  if(err){
+    console.log(err)
+  } else {
+console.log("connected")
+  }
+})
+// //  step six: create table 
  
 app.get('/createTable',(req,res)=>{
 
@@ -45,7 +51,7 @@ app.get('/createTable',(req,res)=>{
 })
 //  step seven: insert data 
 app.post('/insertUsear',(req,res)=>{
-      const {City,Address,FirstName,LastName}=req.body
+      const {City,Address,FirstName,LastName} = req.body
     
      let insertUser = `INSERT INTO Persons(City,Address,FirstName,LastName)
      VALUES (?,?,?,?)`
@@ -54,13 +60,29 @@ app.post('/insertUsear',(req,res)=>{
         if(err){
       console.log(err);
         }else{
-            console.log(data);
+           console.log(data);
           res.send('data inserted')
+          //console.log(field)
         }
      })
 
-})
+ })
 
+ app.get('/info',(req ,res)=>{
+  
+  //const select = `select * from  persons`;
+  myConnection.query(`select * from  persons`,(err ,result ,field)=>{
+   if (err){
+     console.log(err)
+   }
+   else{
+     //console.log(select)
+     console.log(field)
+     res.send(result)
+   }
+  })
+ }
+ )
 // step eight
 app.put('/update', (req, res)=>{
     const {id, FirstName} = req.body;
@@ -76,16 +98,33 @@ myConnection.query(updateUser, (err,data,field)=>{
     }else{
         console.log(data);
       res.send('data updated')
+      
     }
  })
 
 })
 
-// step nine
+
+
+
+
+app.get('/info', (req, res) => {
+  myConnection.query('SELECT * FROM Persons', (err, result, fields) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      console.log(fields);
+      res.send(result);
+    }
+  });
+})
+
+// // step nine
 
 app.delete('/delete', (req, res)=>{
     const {id} = req.body
-    let deleteUser = `DELETE FROM Persons WHERE PersonID = '${id}'`
+    let deleteUser = `DELETE  FROM Persons WHERE PersonID = '${id}'`
 
     myConnection.query(deleteUser, (err,data,field)=>{
         if(err){
@@ -99,7 +138,7 @@ app.delete('/delete', (req, res)=>{
 })
 
 
-// step five : create conneciton with DB
+// // step five : create conneciton with DB
 
 myConnection.connect((err)=>{
     if(err){
@@ -115,5 +154,9 @@ myConnection.connect((err)=>{
 //  step three: create lister
 let port = 4801;
 app.listen(port,()=>{
-    console.log(`server is listening to ${port}`);
+    //console.log(`server is listening to ${port}`);
+   // console.log("localhost:/createTable")
+    console.log(`Running on port http://localhost:${port}/createTable`);
+    
+    console.log(`Running on port http://localhost:${port}/insertUsear`);
 }) 
